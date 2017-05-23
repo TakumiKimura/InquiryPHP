@@ -4,7 +4,15 @@ require_once('db_config.php');
 
 // DB用関数
 // ----------------------------
-function get_dbh() {
+function get_dbh() 
+{
+	// 「二重接続」を防ぐためのロジック
+	static $dbh = NULL;
+	if(NULL != $dbh)
+	{
+		return $dbh;
+	}
+
 	// 設定値の取得
 	$db_config = db_config();
     // データの設定
