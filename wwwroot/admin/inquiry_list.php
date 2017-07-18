@@ -2,6 +2,7 @@
 // admin/inquiry_list.php
 require_once( __DIR__ . '/init_auth.php');
 
+// ページ数取得
 $page_num = abs((int)@$_GET['p']);
 $per_page = 10;
 
@@ -55,6 +56,8 @@ $bind_data = array();
 $where_array = array();
 // プリペアドステートメント
 $sql = 'SELECT * FROM inquirys ';
+$sql_count = 'SELECT count(inquiry_id) FROM inquirys ';
+
 // SQLを動的に追加
 // emailの検索(完全一致)
 if ('' !== $find_string['email']) {
@@ -90,13 +93,24 @@ if ('' !== $find_string['birthday_from']) {
     $where_array[] = 'birthday <= :birthday_to';
     $bind_data[':birthday_to'] = $find_string['birthday_to'];
 }
+
 // WHERE句の作成
 if (array() !== $where_array) {
-    $sql .= ' WHERE ' . implode(' and ', $where_array);
+    // WHERE句部分を作って
+    $buf = ' WHERE ' . implode(' and ', $where_array);
+    // sqlに結合
+    $sql .= $buf;
+    $sql_count .= $buf;
 }
+
 // SQLの締め
 $sql .= " ORDER BY {$sort_sql_e} LIMIT :limit_start, :limit_num;";
-//
+$sql_count .= " ;";
+
+// count用のbind_dataを保存しておく
+$bind_data_count = $bind_data;
+
+// LIMIT用のbindデータを入れる
 $bind_data[':limit_start'] = $page_num * $per_page;
 $bind_data[':limit_num']   = $per_page;
 
@@ -110,9 +124,36 @@ foreach($bind_data as $k => $v) {
 $r = $pre->execute(); // XXX エラーチェック省略
 // データを取得
 $data = $pre->fetchAll(PDO::FETCH_ASSOC);
+
 //var_dump($data);
 // テンプレートにデータを渡して
 $smarty_obj->assign('inquiry_list', $data);
+
+// レコード数をカウントする
+$pre_count = $dbh->prepare($sql_count);
+// 値のバインド
+foreach($bind_data_count as $k => $v)
+{
+    $pre_count->bindValue($k, $v);
+}
+
+// sqlを実行
+$r = $pre_count->execute();
+// レコード件数を取得
+$rec_num = $pre_count->fetchAll();
+$rec_num = $rec_num[0][0];
+//var_dump($rec_num);
+// 最大ページ数の計算(全体要素数/1Page要素数:端数切り上げ) - 1(0スタートに合わせる)
+$max_page_num = (int)ceil($rec_num / $per_page) - 1;
+
+// 各ページの設定
+$smarty_obj->assign('next_page', $page_num + 1);
+$smarty_obj->assign('back_page', $page_num - 1);
+// ボタン制御
+$smarty_obj->assign('back_page_flg', (0 === $page_num) ? false : true);
+$smarty_obj->assign('next_page_flg', ($max_page_num === $page_num) ? false : true);
+
+
 // 表示する
 error_reporting(E_ALL & ~E_NOTICE);
 $smarty_obj->display('admin/inquiry_list.tpl');

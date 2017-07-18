@@ -24,8 +24,13 @@ email<input name="email" value="{$find_string.email}"><br>
 </form>
 
 <h2>一覧</h2>
-<a href="" class="btn btn-nomal"> back </a>
-<a href="" class="btn btn-nomal"> next </a><br>
+{if $back_page_flg}
+    <a href="./inquiry_list.php?sort={$sort}&{$uri_params|unescape}&p={$back_page}" class="btn btn-nomal"> back </a>
+{/if}
+{if $next_page_flg}
+<a href="./inquiry_list.php?sort={$sort}&{$uri_params|unescape}&p={$next_page}" class="btn btn-nomal"> next </a>
+{/if}
+<br>
 
 <table class="table table-hover">
 <tr>
