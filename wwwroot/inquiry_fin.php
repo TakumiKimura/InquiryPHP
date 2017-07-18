@@ -1,8 +1,7 @@
 <?php
 // inquiry_fin.php
 //
-ob_start();
-session_start();
+require_once(__DIR__.'/init.php');
 
 //
 require_once(__DIR__ . '/dbh.php');
@@ -116,18 +115,6 @@ $pre->bindValue(':name', $input_data['name']);
 
 // SQLを実行
 $r = $pre->execute();
-if(false === $r)
-{
-    // 本当はもうちょっと丁寧にいろいろやる
-	echo 'すみませんデータが取得できませんでした。';
-	exit;
-}
 
-//「ありがとう」Pageの出力
-?>
-<html>
-<body>
-入力ありがとうございました。
-</body>
-</html>
-
+$smarty_obj->assign('result', $r);
+$smarty_obj->display('inquiry_fin.tpl');

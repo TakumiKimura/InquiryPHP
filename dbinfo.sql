@@ -8,3 +8,13 @@ CREATE TABLE inquirys(
 	birthday DATE COMMENT '誕生日',
 	PRIMARY KEY (`inquiry_id`)
 )CHARACTER SET 'utf8mb4', ENGINE=InnoDB, COMMENT='1レコードが「一件の問い合わせ」を意味するテーブル';
+
+-- 管理者用テーブル
+DROP TABLE IF EXISTS admin_users;
+CREATE TABLE admin_users (
+    admin_user_id_varbinary(64) NOT NULL COMMENT '管理者用のID'
+	pass varbinary(255) NOT NULL COMMENT '管理者のpass'
+	PRIMARY KEY ('admin_user_id')
+)CHARACTER SET 'utf8mb4'
+, ENGINE = InnoDB
+, COMMENT='1レコードが１管理者を意味するテーブル'
