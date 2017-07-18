@@ -1,6 +1,10 @@
 <?php
 // admin/inquiry_list.php
 require_once( __DIR__ . '/init_auth.php');
+
+$page_num = abs((int)@$_GET['p']);
+$per_page = 10;
+
 // sort情報を取得する
 $sort = (string)@$_GET['sort'];
 //var_dump($sort);
@@ -91,7 +95,11 @@ if (array() !== $where_array) {
     $sql .= ' WHERE ' . implode(' and ', $where_array);
 }
 // SQLの締め
-$sql .= " ORDER BY {$sort_sql_e};";
+$sql .= " ORDER BY {$sort_sql_e} LIMIT :limit_start, :limit_num;";
+//
+$bind_data[':limit_start'] = $page_num * $per_page;
+$bind_data[':limit_num']   = $per_page;
+
 $pre = $dbh->prepare($sql);
 //var_dump($sql);
 // 値のバインド

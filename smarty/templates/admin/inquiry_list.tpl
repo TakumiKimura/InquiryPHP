@@ -24,6 +24,9 @@ email<input name="email" value="{$find_string.email}"><br>
 </form>
 
 <h2>一覧</h2>
+<a href="" class="btn btn-nomal"> back </a>
+<a href="" class="btn btn-nomal"> next </a><br>
+
 <table class="table table-hover">
 <tr>
   <th>ID<a href="./inquiry_list.php?sort=id&{$uri_params|unescape}">▲</a><a href="./inquiry_list.php?sort=id_desc&{$uri_params|unescape}">▼</a>
